@@ -429,7 +429,7 @@ internal class TimelineChunk(
     ).let { timelineEvent ->
         // eventually enhance with ui echo?
         uiEchoManager?.decorateEventWithReactionUiEcho(timelineEvent)?.let { timelineEventWithEcho ->
-            if (timelineEventWithEcho.isReply() && !timelineEvent.root.isThread()) {
+            if (timelineEventWithEcho.isReply() && !timelineEventWithEcho.root.isThread()) {
                 createNewEncryptedRepliedEvent(timelineEventWithEcho)?.let { newEvent ->
                     timelineEventWithEcho.copy(root = newEvent)
                 } ?: timelineEventWithEcho
