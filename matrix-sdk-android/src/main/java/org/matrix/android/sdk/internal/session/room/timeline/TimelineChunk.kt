@@ -31,6 +31,7 @@ import org.matrix.android.sdk.api.session.events.model.Event
 import org.matrix.android.sdk.api.session.events.model.EventType
 import org.matrix.android.sdk.api.session.events.model.UnsignedData
 import org.matrix.android.sdk.api.session.events.model.content.EncryptedEventContent
+import org.matrix.android.sdk.api.session.events.model.isThread
 import org.matrix.android.sdk.api.session.events.model.toContent
 import org.matrix.android.sdk.api.session.events.model.toModel
 import org.matrix.android.sdk.api.session.room.model.message.MessageContent
@@ -427,13 +428,13 @@ internal class TimelineChunk(
             buildReadReceipts = timelineSettings.buildReadReceipts
     ).let { timelineEvent ->
         // eventually enhance with ui echo?
-        uiEchoManager?.decorateEventWithReactionUiEcho(timelineEvent)
-
-        if (timelineEvent.isReply()) {
-            createNewEncryptedRepliedEvent(timelineEvent)?.let { newEvent ->
-                timelineEvent.copy(root = newEvent)
-            } ?: timelineEvent
-        } else timelineEvent
+        uiEchoManager?.decorateEventWithReactionUiEcho(timelineEvent)?.let { timelineEventWithEcho ->
+            if (timelineEventWithEcho.isReply() && !timelineEvent.root.isThread()) {
+                createNewEncryptedRepliedEvent(timelineEventWithEcho)?.let { newEvent ->
+                    timelineEventWithEcho.copy(root = newEvent)
+                } ?: timelineEventWithEcho
+            } else timelineEventWithEcho
+        } ?: timelineEvent
     }
 
     private fun createNewEncryptedRepliedEvent(currentTimelineEvent: TimelineEvent): Event? {
@@ -442,6 +443,7 @@ internal class TimelineChunk(
         } else {
             currentTimelineEvent.root.content.toModel<MessageContent>()?.relatesTo?.inReplyTo?.eventId
         }
+
         return relatesEventId?.let { eventId ->
             val timeLineEventEntity = TimelineEventEntity.where(
                     realm.get(),
