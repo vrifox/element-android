@@ -579,7 +579,8 @@ internal class LocalEchoEventFactory @Inject constructor(
             replyText: CharSequence,
             autoMarkdown: Boolean,
             rootThreadEventId: String? = null,
-            showInThread: Boolean
+            showInThread: Boolean,
+            isRedactedEvent: Boolean = false
     ): MessageContent? {
         // Fallbacks and event representation
         // TODO Add error/warning logs when any of this is null
@@ -587,7 +588,7 @@ internal class LocalEchoEventFactory @Inject constructor(
         val userId = eventReplied.root.senderId ?: return null
         val userLink = permalinkFactory.createPermalink(userId, false) ?: return null
 
-        val body = bodyForReply(eventReplied.getLastMessageContent(), eventReplied.isReply())
+        val body = bodyForReply(eventReplied.getLastMessageContent(), eventReplied.isReply(), isRedactedEvent)
 
         // As we always supply formatted body for replies we should force the MarkdownParser to produce html.
         val replyTextFormatted = markdownParser.parse(replyText, force = true, advanced = autoMarkdown).takeFormatted()
@@ -694,7 +695,7 @@ internal class LocalEchoEventFactory @Inject constructor(
      * In case of an edit of a reply the last content is not
      * himself a reply, but it will contain the fallbacks, so we have to trim them.
      */
-    fun bodyForReply(content: MessageContent?, isReply: Boolean): TextContent {
+    fun bodyForReply(content: MessageContent?, isReply: Boolean, isRedactedEvent: Boolean = false): TextContent {
         when (content?.msgType) {
             MessageType.MSGTYPE_EMOTE,
             MessageType.MSGTYPE_TEXT,
@@ -703,7 +704,9 @@ internal class LocalEchoEventFactory @Inject constructor(
                 if (content is MessageContentWithFormattedBody) {
                     formattedText = content.matrixFormattedBody
                 }
-                return if (isReply) {
+                return if (isRedactedEvent) {
+                    TextContent("message removed.")
+                } else if (isReply) {
                     TextContent(content.body, formattedText).removeInReplyFallbacks()
                 } else {
                     TextContent(content.body, formattedText)
@@ -717,7 +720,11 @@ internal class LocalEchoEventFactory @Inject constructor(
             MessageType.MSGTYPE_POLL_START -> {
                 return TextContent((content as? MessagePollContent)?.getBestPollCreationInfo()?.question?.getBestQuestion() ?: "")
             }
-            else -> return TextContent(content?.body ?: "")
+            else -> {
+                return if (isRedactedEvent) {
+                    TextContent("message removed.")
+                } else TextContent(content?.body ?: "")
+            }
         }
     }
 

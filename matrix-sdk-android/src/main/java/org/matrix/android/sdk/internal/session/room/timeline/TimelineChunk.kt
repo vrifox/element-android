@@ -43,6 +43,7 @@ import org.matrix.android.sdk.api.session.room.timeline.isReply
 import org.matrix.android.sdk.api.settings.LightweightSettingsStorage
 import org.matrix.android.sdk.internal.database.mapper.EventMapper
 import org.matrix.android.sdk.internal.database.mapper.TimelineEventMapper
+import org.matrix.android.sdk.internal.database.mapper.asDomain
 import org.matrix.android.sdk.internal.database.model.ChunkEntity
 import org.matrix.android.sdk.internal.database.model.ChunkEntityFields
 import org.matrix.android.sdk.internal.database.model.TimelineEventEntity
@@ -429,15 +430,19 @@ internal class TimelineChunk(
     ).let { timelineEvent ->
         // eventually enhance with ui echo?
         uiEchoManager?.decorateEventWithReactionUiEcho(timelineEvent)?.let { timelineEventWithEcho ->
-            if (timelineEventWithEcho.isReply() && !timelineEventWithEcho.root.isThread()) {
-                createNewEncryptedRepliedEvent(timelineEventWithEcho)?.let { newEvent ->
-                    timelineEventWithEcho.copy(root = newEvent)
-                } ?: timelineEventWithEcho
-            } else timelineEventWithEcho
+            handleRepliedEvent(timelineEventWithEcho)
         } ?: timelineEvent
     }
 
-    private fun createNewEncryptedRepliedEvent(currentTimelineEvent: TimelineEvent): Event? {
+    private fun handleRepliedEvent(currentTimelineEvent: TimelineEvent): TimelineEvent {
+        return if (currentTimelineEvent.isReply() && !currentTimelineEvent.root.isThread()) {
+            createNewRepliedEvent(currentTimelineEvent)?.let { newEvent ->
+                currentTimelineEvent.copy(root = newEvent)
+            } ?: currentTimelineEvent
+        } else currentTimelineEvent
+    }
+
+    private fun createNewRepliedEvent(currentTimelineEvent: TimelineEvent): Event? {
         val relatesEventId = if (currentTimelineEvent.isEncrypted()) {
             currentTimelineEvent.root.content.toModel<EncryptedEventContent>()?.relatesTo?.inReplyTo?.eventId
         } else {
@@ -451,6 +456,8 @@ internal class TimelineChunk(
                     eventId
             ).findFirst()
 
+            val isRedactedEvent = timeLineEventEntity?.root?.asDomain()?.isRedacted() ?: false
+
             val replyText = localEchoEventFactory
                     .bodyForReply(currentTimelineEvent.getLastMessageContent(), true).formattedText ?: ""
 
@@ -459,7 +466,8 @@ internal class TimelineChunk(
                         timelineEventMapper.map(timelineEventEntity),
                         replyText,
                         false,
-                        showInThread = false
+                        showInThread = false,
+                        isRedactedEvent = isRedactedEvent
                 ).toContent()
                 val event = currentTimelineEvent.root
                 Event(
