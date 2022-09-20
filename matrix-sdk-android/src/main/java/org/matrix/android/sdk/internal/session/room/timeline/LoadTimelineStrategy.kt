@@ -45,6 +45,10 @@ import org.matrix.android.sdk.internal.database.query.where
 import org.matrix.android.sdk.internal.session.room.relation.threads.FetchThreadTimelineTask
 import org.matrix.android.sdk.internal.session.room.send.LocalEchoEventFactory
 import org.matrix.android.sdk.internal.session.room.state.StateEventDataSource
+import org.matrix.android.sdk.internal.session.room.timeline.decorator.TimelineEventDecorator
+import org.matrix.android.sdk.internal.session.room.timeline.decorator.TimelineEventDecoratorChain
+import org.matrix.android.sdk.internal.session.room.timeline.decorator.UiEchoDecorator
+import org.matrix.android.sdk.internal.session.room.timeline.decorator.UpdatedReplyDecorator
 import org.matrix.android.sdk.internal.session.sync.handler.room.ThreadsAwarenessHandler
 import org.matrix.android.sdk.internal.util.time.Clock
 import timber.log.Timber
@@ -325,6 +329,21 @@ internal class LoadTimelineStrategy constructor(
     }
 
     private fun RealmResults<ChunkEntity>.createTimelineChunk(): TimelineChunk? {
+
+        fun createTimelineEventDecorator(): TimelineEventDecorator {
+            val decorators = listOf(
+                    UiEchoDecorator(uiEchoManager),
+                    UpdatedReplyDecorator(
+                            realm = dependencies.realm,
+                            roomId = roomId,
+                            localEchoEventFactory = dependencies.localEchoEventFactory,
+                            timelineEventMapper = dependencies.timelineEventMapper
+                    )
+            )
+            return TimelineEventDecoratorChain(decorators)
+        }
+
+
         return firstOrNull()?.let {
             return TimelineChunk(
                     chunkEntity = it,
@@ -344,7 +363,8 @@ internal class LoadTimelineStrategy constructor(
                     onBuiltEvents = dependencies.onEventsUpdated,
                     onEventsDeleted = dependencies.onEventsDeleted,
                     realm = dependencies.realm,
-                    localEchoEventFactory = dependencies.localEchoEventFactory
+                    localEchoEventFactory = dependencies.localEchoEventFactory,
+                    decorator = createTimelineEventDecorator()
             )
         }
     }
