@@ -407,7 +407,6 @@ internal class TimelineChunk(
     }
 
     private fun TimelineEventEntity.buildAndDecryptIfNeeded(): TimelineEvent {
-
         /**
          * Makes sure to update some internal state after a TimelineEvent is built.
          */

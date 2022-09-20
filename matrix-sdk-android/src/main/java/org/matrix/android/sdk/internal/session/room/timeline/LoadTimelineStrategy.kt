@@ -329,7 +329,6 @@ internal class LoadTimelineStrategy constructor(
     }
 
     private fun RealmResults<ChunkEntity>.createTimelineChunk(): TimelineChunk? {
-
         fun createTimelineEventDecorator(): TimelineEventDecorator {
             val decorators = listOf(
                     UiEchoDecorator(uiEchoManager),
@@ -342,7 +341,6 @@ internal class LoadTimelineStrategy constructor(
             )
             return TimelineEventDecoratorChain(decorators)
         }
-
 
         return firstOrNull()?.let {
             return TimelineChunk(
