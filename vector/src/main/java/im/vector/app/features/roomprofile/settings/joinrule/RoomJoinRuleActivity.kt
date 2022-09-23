@@ -29,7 +29,6 @@ import com.airbnb.mvrx.viewModel
 import com.airbnb.mvrx.withState
 import dagger.hilt.android.AndroidEntryPoint
 import im.vector.app.R
-import im.vector.app.core.error.ErrorFormatter
 import im.vector.app.core.extensions.addFragment
 import im.vector.app.core.extensions.commitTransaction
 import im.vector.app.core.extensions.toMvRxBundle
@@ -43,7 +42,6 @@ import im.vector.app.features.roomprofile.settings.joinrule.advanced.RoomJoinRul
 import im.vector.app.features.roomprofile.settings.joinrule.advanced.RoomJoinRuleChooseRestrictedFragment
 import im.vector.app.features.roomprofile.settings.joinrule.advanced.RoomJoinRuleChooseRestrictedState
 import im.vector.app.features.roomprofile.settings.joinrule.advanced.RoomJoinRuleChooseRestrictedViewModel
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class RoomJoinRuleActivity : VectorBaseActivity<ActivitySimpleBinding>() {
@@ -51,9 +49,6 @@ class RoomJoinRuleActivity : VectorBaseActivity<ActivitySimpleBinding>() {
     override fun getBinding() = ActivitySimpleBinding.inflate(layoutInflater)
 
     private lateinit var roomProfileArgs: RoomProfileArgs
-
-    @Inject
-    lateinit var errorFormatter: ErrorFormatter
 
     val viewModel: RoomJoinRuleChooseRestrictedViewModel by viewModel()
 

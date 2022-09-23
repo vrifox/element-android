@@ -25,11 +25,9 @@ import com.airbnb.mvrx.viewModel
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
 import im.vector.app.R
-import im.vector.app.core.error.ErrorFormatter
 import im.vector.app.core.platform.VectorBaseActivity
 import im.vector.app.databinding.ActivityCallTransferBinding
 import kotlinx.parcelize.Parcelize
-import javax.inject.Inject
 
 @Parcelize
 data class CallTransferArgs(val callId: String) : Parcelable
@@ -38,8 +36,6 @@ private const val USER_LIST_FRAGMENT_TAG = "USER_LIST_FRAGMENT_TAG"
 
 @AndroidEntryPoint
 class CallTransferActivity : VectorBaseActivity<ActivityCallTransferBinding>() {
-
-    @Inject lateinit var errorFormatter: ErrorFormatter
 
     private lateinit var sectionsPagerAdapter: CallTransferPagerAdapter
 
