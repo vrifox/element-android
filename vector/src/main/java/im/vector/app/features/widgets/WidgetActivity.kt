@@ -39,14 +39,12 @@ import im.vector.app.R
 import im.vector.app.core.extensions.addFragment
 import im.vector.app.core.platform.VectorBaseActivity
 import im.vector.app.databinding.ActivityWidgetBinding
-import im.vector.app.features.settings.VectorPreferences
 import im.vector.app.features.widgets.permissions.RoomWidgetPermissionBottomSheet
 import im.vector.app.features.widgets.permissions.RoomWidgetPermissionViewEvents
 import im.vector.app.features.widgets.permissions.RoomWidgetPermissionViewModel
 import org.matrix.android.sdk.api.extensions.orFalse
 import org.matrix.android.sdk.api.session.events.model.Content
 import java.io.Serializable
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class WidgetActivity : VectorBaseActivity<ActivityWidgetBinding>() {
@@ -80,8 +78,6 @@ class WidgetActivity : VectorBaseActivity<ActivityWidgetBinding>() {
 
     private val viewModel: WidgetViewModel by viewModel()
     private val permissionViewModel: RoomWidgetPermissionViewModel by viewModel()
-
-    @Inject lateinit var vectorPreferences: VectorPreferences
 
     override fun getBinding() = ActivityWidgetBinding.inflate(layoutInflater)
 

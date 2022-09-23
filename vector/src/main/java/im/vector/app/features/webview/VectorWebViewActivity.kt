@@ -21,11 +21,9 @@ import android.content.Intent
 import android.webkit.WebChromeClient
 import android.webkit.WebView
 import dagger.hilt.android.AndroidEntryPoint
-import im.vector.app.core.di.ActiveSessionHolder
 import im.vector.app.core.platform.VectorBaseActivity
 import im.vector.app.databinding.ActivityVectorWebViewBinding
 import org.matrix.android.sdk.api.session.Session
-import javax.inject.Inject
 
 /**
  * This class is responsible for managing a WebView
@@ -38,7 +36,6 @@ class VectorWebViewActivity : VectorBaseActivity<ActivityVectorWebViewBinding>()
 
     override fun getBinding() = ActivityVectorWebViewBinding.inflate(layoutInflater)
 
-    @Inject lateinit var activeSessionHolder: ActiveSessionHolder
     val session: Session by lazy {
         activeSessionHolder.getActiveSession()
     }
