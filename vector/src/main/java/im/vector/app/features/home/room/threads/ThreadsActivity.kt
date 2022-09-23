@@ -39,8 +39,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class ThreadsActivity : VectorBaseActivity<ActivityThreadsBinding>() {
 
-    @Inject
-    lateinit var avatarRenderer: AvatarRenderer
+    @Inject lateinit var avatarRenderer: AvatarRenderer
 
 //    private val roomThreadDetailFragment: RoomThreadDetailFragment?
 //        get() {
