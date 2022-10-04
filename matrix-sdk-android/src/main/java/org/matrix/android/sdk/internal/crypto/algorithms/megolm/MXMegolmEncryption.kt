@@ -162,7 +162,8 @@ internal class MXMegolmEncryption(
                 forwardingCurve25519KeyChain = emptyList(),
                 keysClaimed = keysClaimedMap,
                 exportFormat = false,
-                sharedHistory = sharedHistory
+                sharedHistory = sharedHistory,
+                trusted = true
         )
 
         defaultKeysBackupService.maybeBackupKeys()
@@ -535,7 +536,7 @@ internal class MXMegolmEncryption(
 
     @Throws
     override suspend fun shareHistoryKeysWithDevice(inboundSessionWrapper: InboundGroupSessionHolder, deviceInfo: CryptoDeviceInfo) {
-        if (!inboundSessionWrapper.wrapper.sessionData.sharedHistory) throw IllegalArgumentException("This key can't be shared")
+        require(inboundSessionWrapper.wrapper.sessionData.sharedHistory) { "This key can't be shared" }
         Timber.tag(loggerTag.value).i("process shareHistoryKeys for ${inboundSessionWrapper.wrapper.safeSessionId} to ${deviceInfo.shortDebugString()}")
         val userId = deviceInfo.userId
         val deviceId = deviceInfo.deviceId

@@ -78,7 +78,7 @@ internal class DefaultTimeline(
 ) : Timeline {
 
     companion object {
-        val BACKGROUND_HANDLER = createBackgroundHandler("DefaultTimeline_Thread")
+        val BACKGROUND_HANDLER = createBackgroundHandler("Matrix-DefaultTimeline_Thread")
     }
 
     override val timelineID = UUID.randomUUID().toString()

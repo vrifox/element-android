@@ -45,8 +45,20 @@ class FakeRegistrationWizard : RegistrationWizard by mockk(relaxed = false) {
         }
     }
 
+    fun givenRegistrationStarted(hasStarted: Boolean) {
+        coEvery { isRegistrationStarted() } returns hasStarted
+    }
+
+    fun givenCurrentThreePid(threePid: String?) {
+        coEvery { getCurrentThreePid() } returns threePid
+    }
+
     fun givenUserNameIsAvailable(userName: String) {
         coEvery { registrationAvailable(userName) } returns RegistrationAvailability.Available
+    }
+
+    fun givenUserNameIsAvailableThrows(userName: String, cause: Throwable) {
+        coEvery { registrationAvailable(userName) } throws cause
     }
 
     fun givenUserNameIsUnavailable(userName: String, failure: Failure.ServerError) {

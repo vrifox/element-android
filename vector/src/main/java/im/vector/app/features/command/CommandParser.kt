@@ -317,6 +317,13 @@ class CommandParser @Inject constructor() {
                         ParsedCommand.ErrorSyntax(Command.MARKDOWN)
                     }
                 }
+                Command.DEVTOOLS.matches(slashCommand) -> {
+                    if (messageParts.size == 1) {
+                        ParsedCommand.DevTools
+                    } else {
+                        ParsedCommand.ErrorSyntax(Command.DEVTOOLS)
+                    }
+                }
                 Command.CLEAR_SCALAR_TOKEN.matches(slashCommand) -> {
                     if (messageParts.size == 1) {
                         ParsedCommand.ClearScalarToken
@@ -336,6 +343,9 @@ class CommandParser @Inject constructor() {
                 }
                 Command.LENNY.matches(slashCommand) -> {
                     ParsedCommand.SendLenny(message)
+                }
+                Command.TABLE_FLIP.matches(slashCommand) -> {
+                    ParsedCommand.SendTableFlip(message)
                 }
                 Command.DISCARD_SESSION.matches(slashCommand) -> {
                     if (messageParts.size == 1) {
@@ -374,15 +384,15 @@ class CommandParser @Inject constructor() {
                     }
                 }
                 Command.ADD_TO_SPACE.matches(slashCommand) -> {
-                    if (messageParts.size == 1) {
-                        ParsedCommand.AddToSpace(spaceId = message)
+                    if (messageParts.size == 2) {
+                        ParsedCommand.AddToSpace(spaceId = messageParts.last())
                     } else {
                         ParsedCommand.ErrorSyntax(Command.ADD_TO_SPACE)
                     }
                 }
                 Command.JOIN_SPACE.matches(slashCommand) -> {
-                    if (messageParts.size == 1) {
-                        ParsedCommand.JoinSpace(spaceIdOrAlias = message)
+                    if (messageParts.size == 2) {
+                        ParsedCommand.JoinSpace(spaceIdOrAlias = messageParts.last())
                     } else {
                         ParsedCommand.ErrorSyntax(Command.JOIN_SPACE)
                     }

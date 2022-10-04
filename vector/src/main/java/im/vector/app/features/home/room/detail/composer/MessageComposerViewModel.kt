@@ -107,7 +107,6 @@ class MessageComposerViewModel @AssistedInject constructor(
             is MessageComposerAction.PlayOrPauseVoicePlayback -> handlePlayOrPauseVoicePlayback(action)
             MessageComposerAction.PauseRecordingVoiceMessage -> handlePauseRecordingVoiceMessage()
             MessageComposerAction.PlayOrPauseRecordingPlayback -> handlePlayOrPauseRecordingPlayback()
-            is MessageComposerAction.EndAllVoiceActions -> handleEndAllVoiceActions(action.deleteRecord)
             is MessageComposerAction.InitializeVoiceRecorder -> handleInitializeVoiceRecorder(action.attachmentData)
             is MessageComposerAction.OnEntersBackground -> handleEntersBackground(action.composerText)
             is MessageComposerAction.VoiceWaveformTouchedUp -> handleVoiceWaveformTouchedUp(action)
@@ -256,6 +255,10 @@ class MessageComposerViewModel @AssistedInject constructor(
                         is ParsedCommand.SetUserPowerLevel -> {
                             handleSetUserPowerLevel(parsedCommand)
                         }
+                        is ParsedCommand.DevTools -> {
+                            _viewEvents.post(MessageComposerViewEvents.SlashCommandResultOk(parsedCommand))
+                            popDraft()
+                        }
                         is ParsedCommand.ClearScalarToken -> {
                             // TODO
                             _viewEvents.post(MessageComposerViewEvents.SlashCommandNotImplemented)
@@ -360,6 +363,11 @@ class MessageComposerViewModel @AssistedInject constructor(
                         }
                         is ParsedCommand.SendLenny -> {
                             sendPrefixedMessage("( ͡° ͜ʖ ͡°)", parsedCommand.message, state.rootThreadEventId)
+                            _viewEvents.post(MessageComposerViewEvents.SlashCommandResultOk(parsedCommand))
+                            popDraft()
+                        }
+                        is ParsedCommand.SendTableFlip -> {
+                            sendPrefixedMessage("(╯°□°）╯︵ ┻━┻", parsedCommand.message, state.rootThreadEventId)
                             _viewEvents.post(MessageComposerViewEvents.SlashCommandResultOk(parsedCommand))
                             popDraft()
                         }
@@ -884,10 +892,14 @@ class MessageComposerViewModel @AssistedInject constructor(
     }
 
     private fun handlePlayOrPauseRecordingPlayback() {
-        audioMessageHelper.startOrPauseRecordingPlayback()
+        try {
+            audioMessageHelper.startOrPauseRecordingPlayback()
+        } catch (failure: Throwable) {
+            _viewEvents.post(MessageComposerViewEvents.VoicePlaybackOrRecordingFailure(failure))
+        }
     }
 
-    private fun handleEndAllVoiceActions(deleteRecord: Boolean) {
+    fun endAllVoiceActions(deleteRecord: Boolean = true) {
         audioMessageHelper.clearTracker()
         audioMessageHelper.stopAllVoiceActions(deleteRecord)
     }
