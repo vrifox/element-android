@@ -90,6 +90,12 @@ android {
         ]
     }
 
+    packagingOptions {
+        merge "**/MANIFEST.MF"
+        merge "META-INF/LICENSE.md"
+        merge "META-INF/LICENSE-notice.md"
+    }
+
     sourceSets {
         androidTest {
             java.srcDirs += "src/sharedTest/java"

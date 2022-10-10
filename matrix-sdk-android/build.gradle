@@ -98,6 +98,11 @@ android {
 //        timeOutInMs 350 * 1000
     }
 
+    packagingOptions {
+        merge "META-INF/LICENSE.md"
+        merge "META-INF/LICENSE-notice.md"
+    }
+
     compileOptions {
         sourceCompatibility versions.sourceCompat
         targetCompatibility versions.targetCompat
